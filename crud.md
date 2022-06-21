@@ -48,8 +48,10 @@ use aaa;
 
 1. from 
 2. where
-3. select
-4. order by
+3. group by
+4. having
+5. select
+6. order by
 
 
 ```sql
@@ -138,11 +140,50 @@ select ename,ifnull(comm,0) as comm from aaa;
 /* 找出比平均工资高的 */
 select 
 
+```
 
+#### group by 和 having
+
+group by: 按照某个字段或者某些字段进行分组。
+having: having是对分组之后的数据进行再次过滤
+分组函数一般都会和group by联合使用
+
+```sql
+select max(sal) from aaa group by job;
+
+select ename,sal from aaa where sal > (select avg(sal) from emp);/* 找出高于平均工资的员工 */
+
+select max(sal),job from aaa group by job; /* 找出每个工作岗位的最大薪资 */
+
+/* 当一条语句中有group by的话, select后面只能跟分组函数和参与分组的字段 */
+
+/* 找出不同部门不同工作岗位的最高薪资 */
+select detno,job max(sal) from aaa group by deptna,job;
+
+/* 找出每个部门的最高薪资,要求显示薪资大于2900的数据 */
+select max(sal),deptno from aaa group by deptno having max(sal)>2900  /*这种效率低 */
+select max(sal),deptno from aaa where sal >2900 group by deptno;/* 这种效率高  建议能使用where就尽量使用where*/
+/* 找出每个部门的平均薪资, 要求显示薪资大于2000的数据 */
+select deptno, avg(sal) from aaa group by deptno having avg(sal)>2000;
 
 ```
 
+#### 查询结果集的去重
+
+```sql
+
+select distinct job from aaa; /* distinct关键字是去除重复 distinct只能出现在所有字段的最前面 */
+select distinct deptno,job from aaa; /* deptno和job都去重了 */
+
+/* 统计岗位的数量 */
+select count(distinct job) from aaa;
+
+```
+
+
 #### 删库
 
+```sql
 drop databaes aaa;
 
+```
