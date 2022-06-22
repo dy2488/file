@@ -180,6 +180,75 @@ select count(distinct job) from aaa;
 
 ```
 
+#### 表的连接方式
+
+**笛卡尔积现象**: 当两张表进行连接查询的时候，没有任何条件限制，最终的查询结果数条是两张表记录条数的乘机
+
+**避免笛卡尔积现象**: 加条件过滤。避免了笛卡尔积现象.不会减少匹配次数只不过是显示的是有效记录
+
+
+##### 内连接
+
+**等值连接**
+
+/* 找出每一个员工的部门名称, 要求显示员工和部门名 */
+```sql
+
+select e.ename,d.dname from emp e, dept d where e.deptno=d.deptno;
+
+```
+**sql99语法**: 
+```sql
+
+select e.ename,d.dname from emp e join dept d on e.deptno= d.deptno;
+
+```
+
+
+**表的别名**
+
+```sql
+
+select e.ename,d.dname from emp e, dept d;
+/* 好处  第一  执行效率高.  第二   可读性好.*/
+
+```
+
+**非等值连接**
+
+```sql
+
+select e.ename,e.sal,s.grade from emp e join salgrade s on e.sal between s.losal and s.hisal;
+
+```
+**自连接**
+```sql
+
+/* 找出每个员工的上级领导 要求显示员工和对应的领导名*/ 
+select a.ename as '员工名',b.ename as '领导名' from emp a join emp b on a.mgr =b.empno;
+
+```
+##### 外连接
+
+假设A和B表进行连接,使用外连接的话，AB两张表中有一张表是主表,一张表是副表,主要是查询主表中的数据,顺便查副表,当副表中的数据没有和主表中的数据匹配上,副表自动模拟出NULL与之匹配.
+
+**左外连接(左连接)**
+**右外连接(右连接)**
+```sql
+
+/*找出每个员工的上级领导(所有员工必须都查询出来) */
+select a.ename '员工', b.ename '领导' from emp a left join emp b on a.mgr=b.empno;
+
+/* 找出哪个部门没有员工 */
+select d.* from emp e right join dept d on e.deptno =d.deptno where e.emptno is null;
+
+/* 找出每个员工的部门名称以及工资等级 */
+
+A join B join C on .... /* A先和B连接然后A再和C连接 */
+
+select e.ename,d.dname,s.grade from emp e join dept d on e.deptno=d.deptno join salgrade s on e.sal between s.losal and hisal;
+
+```
 
 #### 删库
 
