@@ -249,6 +249,66 @@ A join B join C on .... /* A先和B连接然后A再和C连接 */
 select e.ename,d.dname,s.grade from emp e join dept d on e.deptno=d.deptno join salgrade s on e.sal between s.losal and hisal;
 
 ```
+#### from后面嵌套子查询
+
+```sql
+
+/* 找出每个部门平均薪水的薪资等级 */
+select deptno,avg(sal) as avgsal from emp group by deptno;
+
+select t.*,s.grade from (select deptno,avg(sal) as avgsal from emp group by deptno) t join salgrade s on t.avgsal between s.losal and s.hisal;
+
+/* 每个部门平均的薪资等级 */
+select e.deptno,avg(s.grade) from emp e join salgrade s on e.sal between s.losal and s. hisal group by e.deptno;
+
+```
+
+#### select后面嵌套子查询
+
+```sql
+
+/* 找出每个员工所在的部门名称, 要求显示员工和部门名 */
+select e.ename,(select d.dname from dept d where e.deptno=d.deptno) as dname from emp e;
+
+```
+
+#### union可以将查询结果集相加)
+
+```sql
+
+/* 找出工作岗位是salesman和manager的员工? */
+select ename,job from emp where job='salesman' or 'manager'
+select ename,job from emp where job in('manager','salesman')
+
+select ename,job from emp where job='salesman'
+union
+select ename,job from emp where job='manager';
+
+/* 可以两张不相干的表拼接在一起 */
+
+```
+
+#### limit
+
+limit取结果集中的部分数据,这是它的作用
+limit是sql语句最后执行的一个环节
+
+语法机制 ---> limit startIndex(表示起始位置),length(表示有几个)
+
+```sql
+/* 取出工资前5名的员工(降序前5个) */
+select ename,sal from emp order by sal desc limit 0,5;
+
+select ename,sal from emp order by sal desc limit 5;/* 跟上面的sql语句结果一样 */
+
+/* 找出工资排名在第4到第9名的员工 */
+select ename,sal from emp order by sal desc limit 3,6;
+
+/*每页显示的数据 */
+
+/* 第pageNo页: (pageNo -1)* pageSize,pageSize */
+
+```
 
 #### 删库
 
