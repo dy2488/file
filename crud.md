@@ -310,9 +310,282 @@ select ename,sal from emp order by sal desc limit 3,6;
 
 ```
 
+#### 建表
+
+```sql
+
+create table t_student(
+
+no bigint,
+name varchar(255),
+sex char(1),
+classno varchar(255)
+birth char(10)
+)
+
+```
+
+#### 插入语句
+
+insert语句插入数据
+
+```sql 
+
+insert into t_student(no,name,sex,classno,birth) values(1,'zhangsan','1','gaosanyiban','1950-10-12');
+
+```
+
+#### 表的复制
+
+```sql 
+
+create table emp as select * from emp;
+
+```
+
+#### 修改数据
+
+```sql
+
+update dept1 set loc ='SHANGHAI',dname= 'ReNsHIBU' deptno =10;
+
+/* 更新所有记录 */
+update dept1 set loc ='x',dname = 'y';
+
+```
+
 #### 删库
 
 ```sql
 drop databaes aaa;
 
+delete from 表明 where 条件;
+
+/* 删除10部门数据 */
+delete from dept1 where deptno =10;
+
+delete from dept1; /* 如果数据量特别大那么可能会出现删除时间过长的问题 */
+
+/* 删除大表 */
+truncate table emp1; /* 表被截断, 不可回滚 永久丢失 */
+
 ```
+
+#### 约束
+
+非空约束(not null)
+```sql 
+
+drop table if exists t_user;
+create tble t_user(
+id int,
+username varchar(255) not null,
+password varchar(255)
+);
+
+```
+唯一约束(unique)
+
+```sql 
+
+drop table if exists t_user;
+create tble t_user(
+id int,
+username varchar(255) unique
+password varchar(255)
+);
+
+/* 给两个列或者多个列添加unique */
+drop table if exists t_user;
+create table t_user(
+id int,
+usercode varchar(255),
+username varchar(255),
+unique()
+/* unique(usercode,username) 是一样的 */
+/* usercode varchar(255) unique, username varchar(255) unique,正行不能重复 */
+);
+
+```
+主键约束(primary)
+
+```sql
+
+drop table if exists t_user;
+create table t_user(
+id int primary key,
+username varchar(255),
+email varchar(255)
+
+/* primary key(id) 这样也行 */
+);
+
+/* 主键自增 */
+drop table if exists t_user;
+create table t_user(
+id int primary key auto_increment,
+username varchar(255),
+email varchar(255)
+
+```
+
+外键约束(foreign key)
+
+```sql
+
+create table t_class(
+cno int,
+cname varchar(255),
+primary key(cno)
+);
+
+create table t_student(
+sno int,
+sname varchar(255),
+classno int,
+foreign key(classno) references t_class(cno)
+);
+
+
+```
+
+检查约束(check)
+
+#### 存储引擎
+
+mysql默认使用的存储引擎是 InnoDB方式  默认采用的字符集是UTF-8
+
+**MyISAM存储引擎**
+
+1. mysql最常用的引擎
+3. 不是默认的
+4. 表内容包含 **表结构**,**表数据**,**表索引**
+
+**优点**
+
+可被压缩 节省空间 并且可以转换为只读表 提高检索效率
+
+**缺点**
+
+不支持事物
+
+**InnoDB**
+
+**优点**
+
+支持事物。行级锁,外键等。这种存储引擎数据的安全得到保障
+
+这种InnoDB存储引擎在mysql数据库崩溃之后提供自动恢复
+
+支持外键及引用的完整性，包括级联删除和更新
+
+**缺点**
+
+表的结构存储在 ×××.frm文件中。数据存储在tablespace这样的表空间中，无法被压缩，无法转换成只读.
+
+**MEMORY**存储引擎
+
+不支持事务，数据容易丢失，因为所有数据和索引都是存储在内存当中的.
+
+**优点**
+
+查询速度最快
+
+**缺点**
+
+不支持事务，数据容易丢失。因为所有数据和索引都是存储在内存当中的
+
+#### 事物
+
+* 原子性
+	* 整个事物中的所有操作，必须作为一个单元全部完成(或者全部取消)
+* 一致性
+	* 在事物开始之前与结束之后，数据库都保持一致状态
+* 隔离性
+	* 一个事物不会影响其他事务的运行
+* 持久性
+	* 最终数据必须持久化到硬盘中，事务才算成功的结果
+
+#### 事务之间的隔离性
+
+##### 第一级别
+
+**读未提交(read uncommitted)**: 对方事物还没提交，我们当前事务可以读取到对方未提交的数据。 读未提交存在脏读现象(表示读到了脏的数据)
+
+##### 第二级别
+
+**读已提交**(read committed)**: 对方事物提交之后的数据我方可以读取到。 读已提交存在的问题是: 不可重复读
+
+解决了脏读现象
+
+##### 第三级别
+
+**可重复读(repeatable read)**
+
+这种隔离级别解决了不可重复读的问题
+
+存在问题: 读取到的数据是幻象
+
+##### 第四级别
+
+序列化读/串行化读
+
+解决了所有问题  
+效率低 需要事务排队
+
+oracle数据库默认的隔离级别是: 读已提交.  
+mysql数据库默认的隔离级别是: 可重复读
+
+#### 索引
+
+使用条件:
+
+1. 数据量庞大
+2. 该字段很少的DML操作 (因为字段进行修改操作，索引也需要维护)
+3. 该字段经常出现在where子句中.(经常根据哪个字段查询)
+
+主键和unique约束的字段自动会添加索引
+
+```sql 
+
+/* 给薪资sal字段添加索引 */
+create index emp_sal_index on emp(sal);
+
+/* 删除索引对象 */
+drop index 索引名称 on 表名;
+
+索引底层采用的数据结构是 B + Tree
+
+**索引的实现原理**
+
+通过B Tree缩小扫描范围，底层索引进行了排序，分区，索引会携带数据在表中的“物理地址”，最终通过索引检索到数据之后 ，获取到关联的物理地址，通过物理地址定位表中的数据 效率是最高的。
+
+**索引失效**
+
+模糊查询的时候。第一个通配符使用的是%
+
+```
+
+#### 视图
+
+**作用**
+
+试图可以隐藏表的实现细节，保密级别较高的系统，数据库只对外提供相关的视图 java程序员只对视图对象进行crud
+
+
+#### 导出数据
+
+mysqldump bjpowernode> D:\bjpowernode.sql -uroot -p333
+
+#### 导入数据
+
+create database bjpowernode;
+use bjpowernode;
+source D:\bjpowernode.sql
+
+#### 数据库设计三范式
+
+1. 任何一张表都应该有主键，并且每一个字段原子性不可再分
+2. 建立在第一范式的基础之上，所有非主键字段完全依赖主键。不能产生部分依赖
+3. 建立在第二范式基础之上，所有非主键字段直接依赖主键，不能产生传递依赖
+(注意：在实际开发中，以满足客户的需求u为主，有的时候会拿冗(rong)余换取执行速度 表的连查会笛卡尔积 所以有时候会慢一些
