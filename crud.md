@@ -46,13 +46,16 @@ use aaa;
 
 * 执行顺序
 
-1. from 
-2. where
-3. group by
-4. having
-5. select
-6. order by
-
+from  
+on  
+join  
+where  
+group by  
+having  
+select  
+distinct  
+union  
+order by  
 
 ```sql
 
@@ -377,10 +380,11 @@ truncate table emp1; /* 表被截断, 不可回滚 永久丢失 */
 ```sql 
 
 drop table if exists t_user;
-create tble t_user(
+create table t_user(
 id int,
 username varchar(255) not null,
 password varchar(255)
+primary key(id)
 );
 
 ```
@@ -588,4 +592,4 @@ source D:\bjpowernode.sql
 1. 任何一张表都应该有主键，并且每一个字段原子性不可再分
 2. 建立在第一范式的基础之上，所有非主键字段完全依赖主键。不能产生部分依赖
 3. 建立在第二范式基础之上，所有非主键字段直接依赖主键，不能产生传递依赖
-(注意：在实际开发中，以满足客户的需求u为主，有的时候会拿冗(rong)余换取执行速度 表的连查会笛卡尔积 所以有时候会慢一些
+(注意：在实际开发中，以满足客户的需求为主，有的时候会拿冗(rong)余换取执行速度 表的连查会笛卡尔积 所以有时候会慢一些
